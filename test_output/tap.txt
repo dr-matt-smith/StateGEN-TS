@@ -1,0 +1,129 @@
+TAP version 14
+# tests/behaviours_test.ts
+ok 1 - a state with no behaviours is the usual size
+ok 2 - behaviours are listed the UML way: entry/, do/, exit/
+ok 3 - a state showing its behaviours is taller; hiding them puts it back
+ok 4 - the mouse finds a taller state all the way to its bottom edge
+ok 5 - long behaviour names are split across lines
+ok 6 - DO behaviours are saved as <doStateActions> (version 2), and read back
+ok 7 - a wider state fits more of each behaviour on a line
+ok 8 - a resized state is saved with its size (version 2), and read back
+ok 9 - only real states resize: a choice diamond stays the same size
+# tests/choice_test.ts
+ok 10 - a choice is followed through: GUMBALL SOLD gets two guarded transitions
+ok 11 - export: guards are a guard='...' attribute, and the choice itself isn't written
+ok 12 - import: same event + different guards becomes a choice again, and re-exports the same XML
+ok 13 - an [else] guard is saved in the XML
+ok 14 - editor: the choice tool drags a new diamond; connectors snap inside it; labels show guards
+ok 15 - the initial dot can point at a choice: <initialState> with guarded <event>s, and back again
+ok 16 - the gumball example (initial dot -> choice) imports, then exports, the same XML as it was saved
+# tests/completion_test.ts
+ok 17 - a choice is followed through: GUMBALL SOLD gets two guarded transitions
+ok 18 - export: guards are a guard='...' attribute, and the choice itself isn't written
+ok 19 - import: same event + different guards becomes a choice again, and re-exports the same XML
+ok 20 - an [else] guard is saved in the XML
+ok 21 - editor: the choice tool drags a new diamond; connectors snap inside it; labels show guards
+ok 22 - the initial dot can point at a choice: <initialState> with guarded <event>s, and back again
+ok 23 - the gumball example (initial dot -> choice) imports, then exports, the same XML as it was saved
+ok 24 - a completion transition's label is just its guard (or nothing)
+ok 25 - export: a completion transition is an <event> with no id, and makes the file version 2
+ok 26 - import: an <event> with no id is a completion transition, and re-exports the same XML
+ok 27 - the built-in gumball example uses completion transitions (no warnings)
+ok 28 - an arrow from the initial dot (completion by default) doesn't make the file version 2
+# tests/curves_test.ts
+ok 29 - one arrow between two states is straight
+ok 30 - A->B and B->A curve apart, one either side of the straight line
+ok 31 - three arrows between the same states: one straight, two curved
+ok 32 - an arrow from a state back to itself is a loop, bending away from the state
+ok 33 - picking a curved arrow by its middle finds the right one
+ok 34 - a floating arrow (not attached at both ends) is straight
+ok 35 - minimap: the whole diagram fits, centered, and points map back
+ok 36 - viewport: centerOn() puts a diagram point in the middle of the screen, keeping the zoom
+# tests/editor_test.ts
+ok 37 - the editor starts in STATE_GAME_LOADING, and EVENT_ON_LOAD takes it to STATE_SELECT
+ok 38 - new state tool: SELECT -> STATE DRAG -> (mouse up) -> SELECT, leaving a selected state
+ok 39 - mouse down on a state selects it and drags it, without it jumping
+ok 40 - mouse down on empty space deselects, and stays in SELECT
+ok 41 - new connector tool: drag its start onto a state's compass point and it snaps
+ok 42 - dragging a connector's END, then moving the state - the connector follows
+ok 43 - mouse down on a connector's center: CONNECTOR MOVE, both ends come loose
+ok 44 - clicking a connector's center selects it, but leaves it snapped to its states
+ok 45 - the \# key deletes the selected state; connectors attached to it are left floating
+ok 46 - the \# key deletes the selected connector
+ok 47 - events a state doesn't handle are ignored (e.g. delete while dragging)
+ok 48 - export: EXPORT XML shows the files, back to diagram returns to SELECT
+ok 49 - import replaces the diagram and reports problems
+ok 50 - dropping a connector end INSIDE a state attaches it to the state's center
+ok 51 - near one of the 8 compass points (even just inside the state) beats the center
+ok 52 - a center end's outline point is on the rounded corner, not the square corner
+ok 53 - the diagonal compass points are on the rounded outline
+ok 54 - connector labels: target.event for a web event; a custom event shows just its name
+ok 55 - clicking an arrow's label selects the arrow; it stays attached
+ok 56 - dragging an arrow's label moves the arrow as far as the mouse moves (no jump)
+ok 57 - a label on top of a state: pressing it grabs the arrow, not the state
+ok 58 - Ctrl/Cmd-D duplicates the selected state, a little down and right, with the next free name
+ok 59 - Ctrl/Cmd-D duplicates the selected arrow: same states, same event, curving apart
+ok 60 - Ctrl/Cmd-D with nothing selected does nothing
+ok 61 - drag the selected state's corner: SELECT -> STATE_STATE_RESIZE -> SELECT, top-left stays put
+ok 62 - a state can't be resized smaller than the minimum
+ok 63 - the resize handle is only there while the state is selected
+# tests/layout_test.ts
+ok 64 - a choice is followed through: GUMBALL SOLD gets two guarded transitions
+ok 65 - export: guards are a guard='...' attribute, and the choice itself isn't written
+ok 66 - import: same event + different guards becomes a choice again, and re-exports the same XML
+ok 67 - an [else] guard is saved in the XML
+ok 68 - editor: the choice tool drags a new diamond; connectors snap inside it; labels show guards
+ok 69 - the initial dot can point at a choice: <initialState> with guarded <event>s, and back again
+ok 70 - the gumball example (initial dot -> choice) imports, then exports, the same XML as it was saved
+ok 71 - import without a layout: tidied up, with arrows attached to the CENTER of their states
+ok 72 - import without a layout: arrows both ways between two states are moved apart
+ok 73 - save, then load, puts everything back where it was - including choices
+ok 74 - tidy up: the gumball machine ends up with no crossings and no arrows through states
+ok 75 - tidy up: untangles a square drawn with its arrows crossing
+ok 76 - tidy up: every example comes out with no arrows through states, and the same every time
+ok 77 - separating parallel arrows: side by side, one above the other, and diagonal
+# tests/pseudostate_test.ts
+ok 78 - the initial dot says which state is first; it isn't a transition
+ok 79 - an arrow into the final bullseye ends the state machine - directly, or through a choice
+ok 80 - export: <initialState>, and final='true' on the events that end it
+ok 81 - import: the initial dot and final bullseye come back, and re-export the same XML
+ok 82 - the gumball example's initial dot points at the choice: NO COIN or OUT OF GUMBALLS
+ok 83 - the round shapes: compass points on the circle, an end dropped inside goes to the center
+ok 84 - the round shapes have no edge points: an arrow end can only attach to the center
+ok 85 - editor: the initial and final tools drag out new shapes
+ok 86 - labels: two parallel arrows get their labels apart; a lone label stays above the middle
+# tests/terminate_test.ts
+ok 87 - an arrow into the terminate X deletes the object: a transition with terminate, to no state
+ok 88 - export and import: terminate='true' and where the X is - and back again unchanged
+ok 89 - a terminate X makes the file version 2 at least (Flash didn't have it)
+ok 90 - editor: the terminate tool drags out a new X
+# tests/time_test.ts
+ok 91 - labels: after(ms), and the frame event's web names
+ok 92 - XML: EVENT_AFTER_<ms> imports as a time event, and re-exports the same
+# tests/version3_test.ts
+ok 93 - the palette: every entry has a description and a known category; lookups
+ok 94 - labels: target.event, keys with modifiers, the document left out
+ok 95 - version 1/2 ids are converted to web events, and give the same ids back
+ok 96 - every example imports with no warnings (but stateGEN's own Flash file) and only a version 3 file saves as version 3
+ok 97 - export: version 3 when an event has no old id - no declarations, attributes instead of ids
+ok 98 - import: version 3 comes back exactly, with no warnings
+ok 99 - export: an old ON_LOAD is a completion transition in version 3
+# tests/viewport_test.ts
+ok 100 - viewport: diagram <-> screen, panned and zoomed
+ok 101 - viewport: zooming keeps the point under the mouse where it is, within limits
+ok 102 - viewport: fit zooms as far as it can, centered to the right of the palette
+# tests/xml_test.ts
+ok 103 - export: exactly the Flash version's format (plus the layout attributes)
+ok 104 - export: default connector is a completion transition (no id), special keys are by name
+ok 105 - export: the layout - state positions, and only the ends snapped to a compass point
+ok 106 - export: enter/exit state functions become <enterStateActions>/<exitStateActions>
+ok 107 - import, then export, gives back the same XML
+ok 108 - import: works for every example (the Flash version's, and the gumball machine)
+ok 109 - import: action code that is more than function calls is reported; several calls become a list
+ok 110 - version 2: actions, (p), screens, properties, the mouse area and DELETE import with no warnings
+ok 111 - version 2: import, then export, gives back the same XML
+ok 112 - version 1: several actions are written the Flash way, one call per line
+ok 113 - import: mouse events (EVENT_ON_MOUSE_...) are pointer events, and each warning is given once
+# src/io/XmlExporter.ts
+ok 114 - example in the doc comment (lines 64-70)
+1..114

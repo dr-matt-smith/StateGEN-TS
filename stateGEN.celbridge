@@ -1,0 +1,34 @@
+[celbridge]
+celbridge-version = "1.7.0"
+project-version = "0.1.0"
+
+[celbridge.explorer]
+exclude = [".gitignore", ".DS_Store", "Thumbs.db", "desktop.ini", "deno.lock"]
+
+[celbridge.search]
+exclude = ["node_modules"]
+
+[celbridge.packages]
+folders = ["tools"]
+
+[[shortcut]]
+resource = "terminal.console"
+icon = "bs-terminal"
+area = "bottom"
+open-on-load = true
+
+[[shortcut]]
+resource = "dist/index.html"
+icon = "bs-window"
+area = "side"
+open-on-load = true
+
+[[shortcut]]
+resource = "test_output/index.html"
+icon = "bs-clipboard-check"
+area = "side"
+
+[[shortcut]]
+resource = "README.md"
+icon = "bs-book"
+open-on-load = true

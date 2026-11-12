@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<game version='2'>
+
+<!-- ****************************** USER DEFINED EVENTS  ******************** -->
+<userDefinedEventList>
+	<event id='EVENT_USER_DEFINED_COIN_INSERTED'/>
+	<event id='EVENT_USER_DEFINED_CRANK_TURNED'/>
+</userDefinedEventList>
+
+<!-- ****************************** INITIAL STATE  ******************** -->
+<initialState x='79' y='280' choiceX='230' choiceY='280'>
+	<event newState='STATE_NO_COIN' guard='gumballs &gt; 0'/>
+	<event newState='STATE_OUT_OF_GUMBALLS' guard='gumballs == 0'/>
+</initialState>
+
+<!-- ****************************** STATE ELEMENTS  ******************** -->
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_NO_COIN' x='490' y='280'>
+	<event id='EVENT_USER_DEFINED_COIN_INSERTED' newState='STATE_HAS_COIN'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_HAS_COIN' x='490' y='110'>
+	<event id='EVENT_USER_DEFINED_CRANK_TURNED' newState='STATE_GUMBALL_SOLD'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_GUMBALL_SOLD' x='230' y='110'>
+	<enterStateActions>
+		<action call='releaseGumball'/>
+	</enterStateActions>
+	<event newState='STATE_NO_COIN' guard='gumballs &gt; 0' choiceX='230' choiceY='280'/>
+	<event newState='STATE_OUT_OF_GUMBALLS' guard='gumballs == 0' choiceX='230' choiceY='280'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_OUT_OF_GUMBALLS' x='230' y='450'>
+</state>
+
+</game>

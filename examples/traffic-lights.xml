@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<game>
+<!-- Traffic lights (new): time events, after(ms). Each light stays on for a while, then changes.
+     Pressing the WAIT button while the light is green changes it sooner: the GREEN timer is cancelled. -->
+
+<!-- ****************************** BUTTON INSTANCE NAMES  ******************** -->
+<buttonInstanceList>
+	<button id='waitButton'/>
+</buttonInstanceList>
+
+<!-- ****************************** INITIAL STATE  ******************** -->
+<initialState newState='STATE_RED'/>
+
+<!-- ****************************** STATE ELEMENTS  ******************** -->
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_RED'>
+	<event id='EVENT_AFTER_4000' newState='STATE_GREEN'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_GREEN'>
+	<event id='EVENT_AFTER_8000' newState='STATE_AMBER'/>
+	<event id='EVENT_BUTTON_ON_RELEASE_waitButton' newState='STATE_AMBER'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_AMBER'>
+	<event id='EVENT_AFTER_2000' newState='STATE_RED'/>
+</state>
+
+</game>

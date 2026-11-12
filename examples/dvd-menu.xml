@@ -1,0 +1,38 @@
+<?xml version='1.0'?>
+<game>
+<!-- ****************************** BUTTON INSTANCE NAMES  ******************** -->
+<buttonInstanceList>
+	<button id='playFilmButton'/>
+	<button id='mainMenuButton'/>
+	<button id='extrasButton'/>
+</buttonInstanceList>
+
+<!-- ****************************** USER DEFINED EVENTS  ******************** -->
+<userDefinedEventList>
+	<event id='EVENT_USER_DEFINED_END_OF_FILM_REACHED'/>
+</userDefinedEventList>
+
+<!-- ****************************** STATE ELEMENTS  ******************** -->
+<!-- (the order of the states, and of their events, decides which way each pair of curved arrows bends) -->
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_FILM_PLAYING' frameName='filmPlaying' x='230' y='110'>
+	<event id='EVENT_USER_DEFINED_END_OF_FILM_REACHED' newState='STATE_MAIN_MENU'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_GAME_LOADING' frameName='gameLoading' x='230' y='450'>
+	<event id='EVENT_ON_LOAD' newState='STATE_MAIN_MENU'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_EXTRAS' frameName='extras' x='600' y='280'>
+	<event id='EVENT_BUTTON_ON_RELEASE_mainMenuButton' newState='STATE_MAIN_MENU'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_MAIN_MENU' frameName='mainMenu' x='230' y='280'>
+	<event id='EVENT_BUTTON_ON_RELEASE_playFilmButton' newState='STATE_FILM_PLAYING'/>
+	<event id='EVENT_BUTTON_ON_RELEASE_extrasButton' newState='STATE_EXTRAS'/>
+</state>
+
+</game>

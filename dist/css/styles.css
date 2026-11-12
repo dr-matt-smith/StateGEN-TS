@@ -1,0 +1,289 @@
+/* stateGEN-TS - colours chosen to look like the 2005 Flash version (pale yellow stage, grey palettes). */
+:root {
+  --stage: #ffffcc;
+  --panel: #ece9d8;
+  --panel-dark: #a9a38d;
+  --panel-title: #c3d3ea;
+  --text: #1b1f2a;
+  --muted: #5b6472;
+  --accent: #457b9d;
+  --line: #b9b39b;
+  --input: #ffffff;
+
+  /* diagram colours (used by src/view/DiagramView.ts through CSS classes) */
+  --state-fill: #c0ffff;
+  --state-stroke: #111111;
+  --state-text: #111111;
+  --connector: #111111;
+  --connector-moving: #ff00ff;
+  --connector-selected: #00cc00;
+  --label-bg: #ffff99;
+  --choice-fill: #ffffc0;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --stage: #23231c;
+    --panel: #2b2d33;
+    --panel-dark: #3a3d45;
+    --panel-title: #34435a;
+    --text: #e8eaed;
+    --muted: #9aa3ad;
+    --accent: #a8dadc;
+    --line: #4a4d55;
+    --input: #1c1e22;
+    --state-fill: #9fe3e3;
+    --state-stroke: #e8e8e8;
+    --state-text: #111111;
+    --connector: #e0e0e0;
+    --connector-moving: #ff66ff;
+    --connector-selected: #33dd55;
+    --label-bg: #5a5a20;
+    --choice-fill: #f0f0a8;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--stage);
+  color: var(--text);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+  overflow: hidden;
+}
+button {
+  font: inherit;
+  padding: 4px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+button.secondary { background: transparent; color: var(--accent); }
+button:disabled { opacity: 0.35; cursor: not-allowed; }
+input[type="text"], select, textarea {
+  font: 13px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  background: var(--input);
+  color: var(--text);
+  border-radius: 3px;
+}
+.muted { color: var(--muted); }
+[hidden] { display: none !important; }
+
+#app { height: 100%; }
+
+/* ---------- the diagram screen ---------- */
+#diagram-screen { position: relative; height: 100%; display: flex; flex-direction: column; }
+#diagram-area { position: relative; flex: 1; min-height: 0; }
+#diagram { width: 100%; height: 100%; display: block; user-select: none; touch-action: none; }
+
+/* ---------- the minimap (NEW, after son-of-fungus-JS) ---------- */
+#minimap-box { position: absolute; right: 10px; bottom: 10px; }
+#minimap {
+  display: block;
+  width: 200px; height: 150px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer; touch-action: none; user-select: none;
+}
+#minimap * { vector-effect: non-scaling-stroke; }
+/* the minimise button: top right of the minimap - or, when minimised, all that is left of it */
+#minimapButton {
+  position: absolute; top: 4px; right: 4px;
+  min-width: 20px; height: 20px; padding: 0 5px;
+  font: bold 13px ui-monospace, Menlo, Consolas, monospace; line-height: 1;
+  color: var(--text); background: var(--stage); border: 1px solid var(--line); border-radius: 4px;
+  cursor: pointer; opacity: 0.8;
+}
+#minimapButton:hover { opacity: 1; border-color: var(--text); }
+#minimap-box.minimised #minimap { display: none; }
+#minimap-box.minimised #minimapButton {
+  position: static; height: 24px; padding: 0 8px; opacity: 1;
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.3);
+}
+.mm-connector { fill: none; stroke: var(--muted); stroke-width: 1; }
+.mm-state { fill: var(--state-fill); stroke: var(--state-stroke); stroke-width: 0.5; }
+.mm-choice { fill: var(--choice-fill); stroke: var(--state-stroke); stroke-width: 0.5; }
+.mm-initial { fill: var(--state-stroke); }
+.mm-final { fill: none; stroke: var(--state-stroke); stroke-width: 1.5; }
+.mm-terminate { fill: none; stroke: var(--state-stroke); stroke-width: 2; }
+.mm-view { fill: rgba(231, 76, 60, 0.08); stroke: #e74c3c; stroke-width: 1.5; }
+
+/* ---------- the Tools palette (top right) ---------- */
+#tools {
+  position: absolute; top: 6px; right: 6px;
+  width: 92px;
+  background: var(--panel-dark);
+  border-radius: 4px;
+  padding: 0 4px 6px;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  user-select: none;
+}
+.palette-title { color: #fff; font-weight: bold; padding: 3px 2px; font-size: 13px; }
+.tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--panel); padding: 3px; border-radius: 3px; }
+.tool {
+  background: transparent; border: 1px solid transparent; padding: 2px; border-radius: 3px;
+  height: 30px; color: var(--text); touch-action: none;
+}
+.tool:hover:not(:disabled) { border-color: var(--line); background: var(--stage); }
+.tool.active { border-color: var(--text); background: var(--input); }
+/* the behaviours button: the full width, showing "states now -> states after a click" (aria-pressed: shown) */
+#behavioursButton { grid-column: span 2; }
+#behavioursButton svg { width: 60px; }
+#behavioursButton .next { opacity: 0.5; }
+#behavioursButton[aria-pressed="true"] .when-hidden,
+#behavioursButton[aria-pressed="false"] .when-shown { display: none; }
+.tool svg { width: 22px; height: 22px; fill: currentColor; }
+.tool svg .outline { fill: none; stroke: currentColor; stroke-width: 2; }
+.tool svg .thick { stroke-width: 3; }
+.tool svg .blue { stroke: var(--connector); }
+.tool.zoom-text { font: bold 11px ui-monospace, Menlo, Consolas, monospace; }
+#diagram.panning { cursor: grabbing !important; }
+.xml-tool {
+  display: block; width: 100%; margin-top: 4px;
+  background: var(--panel); color: var(--text); border: 1px solid var(--line);
+  font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: bold;
+}
+
+/* ---------- the diagram itself (SVG) ---------- */
+.state-box { fill: var(--state-fill); stroke: var(--state-stroke); stroke-width: 1.5; }
+.state.hover .state-box { stroke-width: 3; }
+.state.selected .state-box { stroke: var(--connector-selected); stroke-width: 3; }
+.choice .state-box { fill: var(--choice-fill); stroke-linejoin: round; }
+.state-name { font: bold 15px system-ui, sans-serif; fill: var(--state-text); text-anchor: middle; }
+/* NEW: the selected state's resize handle (bottom-right corner) */
+.resize-handle { fill: var(--connector-selected); stroke: var(--stage); stroke-width: 1.5; cursor: nwse-resize; }
+/* NEW: entry/ do/ exit/ behaviours inside a state, under a line */
+.state-divider { stroke: var(--state-stroke); stroke-width: 1.5; }
+.state.hover .state-divider { stroke-width: 2; }
+.state.selected .state-divider { stroke: var(--connector-selected); stroke-width: 2; }
+.state-behaviour { font: 11px ui-monospace, Menlo, Consolas, monospace; fill: var(--state-text); }
+.snap-handle { fill: #ff0000; }
+
+.connector { fill: none; stroke: var(--connector); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.connector.selected { stroke: var(--connector-selected); }
+.connector.moving { stroke: var(--connector-moving); }
+.connector-handle { fill: none; stroke: var(--connector-moving); stroke-width: 2; stroke-opacity: 0.6; }
+.connector-label-bg { fill: var(--label-bg); cursor: pointer; }
+.connector-label { font: bold 12px ui-monospace, Menlo, monospace; fill: var(--text); text-anchor: middle; cursor: pointer; }
+
+/* ---------- the Properties panel ----------
+   A settings-card look: a header (arrow, title, what is selected, one line about it) over a divider, then
+   fields with a bold label above, a rounded input, and a muted line of help below. The arrow minimises it. */
+#properties {
+  --card: #ffffff;
+  --card-line: #e3e5e9;
+  --field-line: #cfd3da;
+  --focus: #2f6fdf;
+  --help: #6b7280;
+  background: var(--card);
+  border-top: 1px solid var(--card-line);
+  box-shadow: 0 -2px 10px rgb(0 0 0 / 0.06);
+  max-height: 45vh;
+  display: flex;
+  flex-direction: column;
+}
+@media (prefers-color-scheme: dark) {
+  #properties {
+    --card: #1f2126;
+    --card-line: #33363d;
+    --field-line: #454952;
+    --focus: #6ea2ff;
+    --help: #9aa3ad;
+  }
+}
+.prop-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--card-line);
+  user-select: none;
+}
+#properties.collapsed .prop-header { border-bottom: none; padding-block: 6px; }
+.prop-toggle {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--help);
+  font-size: 12px;
+  line-height: 1;
+}
+.prop-toggle:hover { background: var(--card-line); color: var(--text); }
+.prop-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.prop-heading { display: flex; align-items: baseline; gap: 12px; min-width: 0; flex-wrap: wrap; }
+.prop-title { font-weight: 700; font-size: 16px; }
+.prop-what {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--focus) 14%, transparent);
+  color: var(--focus);
+}
+.prop-about { color: var(--help); font-size: 13px; }
+#properties.collapsed .prop-about { display: none; }
+.prop-body { overflow: auto; padding: 6px 8px 12px; }
+.prop-row { display: flex; flex-wrap: wrap; gap: 0 8px; }
+.prop-cell { padding: 8px 12px; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.prop-cell.grow { flex: 1 1 220px; }
+.prop-cell label.field { font-weight: 600; font-size: 13px; }
+.prop-help { color: var(--help); font-size: 12px; line-height: 1.35; max-width: 70ch; }
+.prop-value { font: 13px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: var(--help); padding: 6px 0; }
+#properties input[type="text"],
+#properties select {
+  font: 13px/1.4 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  padding: 6px 10px;
+  border: 1px solid var(--field-line);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+}
+#properties input[type="text"] { width: 100%; min-width: 160px; }
+#properties input[type="text"]::placeholder { color: var(--help); opacity: 0.7; }
+#properties input[type="text"]:read-only { background: transparent; border-style: dashed; color: var(--help); }
+#properties input:focus, #properties select:focus {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 22%, transparent);
+}
+#properties select { font-family: inherit; min-width: 200px; cursor: pointer; }
+#properties .inline { display: flex; gap: 8px; align-items: center; }
+#properties input.keycode { width: 90px; min-width: 0; }
+#properties button.secondary { border-radius: 8px; padding: 5px 12px; white-space: nowrap; }
+#properties .checks { display: flex; gap: 14px; padding: 6px 0; white-space: nowrap; }
+#properties .checks label { display: flex; gap: 5px; align-items: center; }
+.prop-note { color: var(--help); max-width: 70ch; padding: 6px 0; }
+.prop-empty { padding: 8px 12px; color: var(--help); max-width: 90ch; }
+
+/* ---------- the export screen ---------- */
+#export-screen { height: 100%; display: flex; flex-direction: column; padding: 10px; gap: 8px; }
+.export-bar { display: flex; gap: 12px; align-items: center; }
+.export-files { flex: 1; display: flex; gap: 10px; min-height: 0; }
+.export-file { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.export-file-bar { display: flex; gap: 8px; align-items: center; }
+.export-file textarea { flex: 1; resize: none; white-space: pre; }
+@media (max-width: 800px) { .export-files { flex-direction: column; } }
+
+/* ---------- dialogs ---------- */
+dialog { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 8px; max-width: min(760px, 95vw); }
+dialog h2 { margin-top: 0; }
+dialog label { margin-right: 16px; }
+#import-text { width: min(700px, 85vw); height: 260px; }
+#message-text { white-space: pre-wrap; max-height: 60vh; overflow: auto; font-size: 13px; }
+.dialog-buttons { text-align: right; display: flex; gap: 8px; justify-content: flex-end; }
+
+/* the initial dot and final bullseye (UML pseudostates) */
+.initial .state-box { fill: var(--state-stroke); }
+.final .state-box { fill: var(--stage); stroke-width: 2; }
+.final-dot { fill: var(--state-stroke); }
+/* NEW: the terminate X - its circle is only there to be picked (and shows when hovered or selected) */
+.terminate .terminate-hit { fill: transparent; stroke: none; }
+.terminate.hover .terminate-hit { stroke: var(--state-stroke); stroke-width: 1; stroke-dasharray: 3 3; }
+.terminate.selected .terminate-hit { stroke: var(--connector-selected); stroke-width: 2; stroke-dasharray: none; }
+.terminate-x { stroke: var(--state-stroke); stroke-width: 2.5; stroke-linecap: round; fill: none; }

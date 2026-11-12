@@ -1,0 +1,122 @@
+<?xml version="1.0" ?>
+<game version='3'>
+
+<!-- stateGEN's own editor, in version 3 of the XML (TDDs/version03.md): every event says what it is -
+     "this DOM event, on this target" - so there are no declaration lists, and no <mouseArea> (mouse down
+     is pointerdown on the diagram). Ctrl/Cmd-D and Escape in the import dialog are events here too. -->
+
+<!-- INITIAL STATE -->
+<initialState newState='STATE_GAME_LOADING'/>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_GAME_LOADING'>
+	<property name='hidesDiagram' type='boolean' value='true'/>
+	<!-- (version 2's ON_LOAD: no event, so it happens straight away) -->
+	<event newState='STATE_SELECT'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_SELECT' screen='diagram-screen'>
+	<property name='highlightHover' type='boolean' value='true'/>
+
+	<event on='animationframe'><action call='drawScene'/></event>
+	<event on='pointermove'><action call='findHover(p)'/></event>
+
+	<!-- what is under the mouse decides the next state: a choice diamond on the diagram -->
+	<!-- (the selected state's resize handle comes first, then an arrow's label - on top of everything -
+	     which grabs the arrow, like its center) -->
+	<event on='pointerdown' target='diagram' guard='overResizeHandle(p)' newState='STATE_STATE_RESIZE'>
+		<action call='grabResizeHandleAt(p)'/>
+	</event>
+	<event on='pointerdown' target='diagram' guard='overConnectorLabel(p)' newState='STATE_CONNECTOR_MOVE'>
+		<action call='grabConnectorByLabelAt(p)'/>
+	</event>
+	<event on='pointerdown' target='diagram' guard='overState(p)' newState='STATE_STATE_DRAG'>
+		<action call='grabStateAt(p)'/>
+	</event>
+	<event on='pointerdown' target='diagram' guard='overConnectorCenter(p)' newState='STATE_CONNECTOR_MOVE'>
+		<action call='grabConnectorAt(p)'/>
+	</event>
+	<event on='pointerdown' target='diagram' guard='overConnectorEnd(p)' newState='STATE_CONNECTOR_DRAG'>
+		<action call='grabConnectorEndAt(p)'/>
+	</event>
+	<event on='pointerdown' target='diagram' guard='else'><action call='deselect'/></event>
+
+	<event on='pointerdown' target='newStateButton' newState='STATE_STATE_DRAG'><action call='createStateAt(p)'/></event>
+	<event on='pointerdown' target='newChoiceButton' newState='STATE_STATE_DRAG'><action call='createChoiceAt(p)'/></event>
+	<event on='pointerdown' target='newInitialButton' newState='STATE_STATE_DRAG'><action call='createInitialAt(p)'/></event>
+	<event on='pointerdown' target='newFinalButton' newState='STATE_STATE_DRAG'><action call='createFinalAt(p)'/></event>
+	<event on='pointerdown' target='newTerminateButton' newState='STATE_STATE_DRAG'><action call='createTerminateAt(p)'/></event>
+	<event on='pointerdown' target='newConnectorButton' newState='STATE_CONNECTOR_DRAG'><action call='createConnectorAt(p)'/></event>
+
+	<event on='click' target='tidyUpButton'><action call='tidyUp'/></event>
+	<event on='click' target='exportXMLButton' newState='STATE_EXPORT_XML'/>
+	<event on='click' target='importXMLButton' newState='STATE_IMPORT_DIALOG'/>
+
+	<event on='keydown' key='Delete'><action call='deleteSelected'/></event>
+	<event on='keydown' key='Backspace'><action call='deleteSelected'/></event>
+	<event on='keydown' key='d' mod='mod'><action call='duplicateSelected'/></event>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_STATE_DRAG' screen='diagram-screen'>
+	<event on='animationframe'><action call='drawScene'/></event>
+	<event on='pointermove'><action call='dragStateTo(p)'/></event>
+	<event on='pointerup' newState='STATE_SELECT'><action call='dropStateAt(p)'/></event>
+	<event on='pointerdown' target='selectButton' newState='STATE_SELECT'/>
+	<event on='pointerdown' target='newConnectorButton' newState='STATE_CONNECTOR_DRAG'><action call='createConnectorAt(p)'/></event>
+</state>
+
+<!-- ****************************** STATE ******************** (NEW) -->
+<state id='STATE_STATE_RESIZE' screen='diagram-screen'>
+	<event on='animationframe'><action call='drawScene'/></event>
+	<event on='pointermove'><action call='resizeStateTo(p)'/></event>
+	<event on='pointerup' newState='STATE_SELECT'><action call='resizeStateTo(p)'/></event>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_CONNECTOR_DRAG' screen='diagram-screen'>
+	<property name='showSnapHandles' type='boolean' value='true'/>
+	<property name='connectorMoving' type='boolean' value='true'/>
+
+	<event on='animationframe'><action call='drawScene'/></event>
+	<event on='pointermove'><action call='dragConnectorEndTo(p)'/></event>
+	<event on='pointerup' newState='STATE_SELECT'/>
+	<event on='pointerdown' target='selectButton' newState='STATE_SELECT'/>
+	<event on='pointerdown' target='newStateButton' newState='STATE_STATE_DRAG'><action call='createStateAt(p)'/></event>
+	<event on='pointerdown' target='newChoiceButton' newState='STATE_STATE_DRAG'><action call='createChoiceAt(p)'/></event>
+	<event on='pointerdown' target='newInitialButton' newState='STATE_STATE_DRAG'><action call='createInitialAt(p)'/></event>
+	<event on='pointerdown' target='newFinalButton' newState='STATE_STATE_DRAG'><action call='createFinalAt(p)'/></event>
+	<event on='pointerdown' target='newTerminateButton' newState='STATE_STATE_DRAG'><action call='createTerminateAt(p)'/></event>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_CONNECTOR_MOVE' screen='diagram-screen'>
+	<property name='connectorMoving' type='boolean' value='true'/>
+
+	<event on='animationframe'><action call='drawScene'/></event>
+	<event on='pointermove'><action call='moveConnectorTo(p)'/></event>
+	<event on='pointerup' newState='STATE_SELECT'/>
+</state>
+
+<!-- ****************************** STATE ******************** -->
+<state id='STATE_EXPORT_XML' screen='export-screen'>
+	<property name='hidesDiagram' type='boolean' value='true'/>
+	<enterStateActions><action call='showGeneratedFiles'/></enterStateActions>
+
+	<event on='click' target='backToDiagramButton' newState='STATE_SELECT'/>
+</state>
+
+<!-- ****************************** STATE ******************** (NEW) -->
+<state id='STATE_IMPORT_DIALOG' screen='diagram-screen'>
+	<enterStateActions><action call='openImportDialog'/></enterStateActions>
+	<exitStateActions><action call='closeImportDialog'/></exitStateActions>
+
+	<event on='click' target='importOkButton' newState='STATE_SELECT'><action call='importFromDialog'/></event>
+	<event on='click' target='importCancelButton' newState='STATE_SELECT'/>
+	<!-- NEW: Escape cancels too. (On the dialog itself, so it counts while typing in it; matching it stops the
+	     browser closing the dialog on its own, behind the state machine's back) -->
+	<event on='keydown' target='import-dialog' key='Escape' newState='STATE_SELECT'/>
+</state>
+
+</game>

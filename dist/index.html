@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>stateGEN-TS</title>
+  </head>
+  <body>
+    <noscript>(if you can read this, dist/app.js has not run - build the project)</noscript>
+    <div id="app">
+      <!-- ===== the diagram (the Flash "stage") ===== -->
+      <section id="diagram-screen">
+        <div id="diagram-area">
+          <svg id="diagram" xmlns="http://www.w3.org/2000/svg"></svg>
+          <!-- the minimap: click or drag on it to move the view; the button minimises it -->
+          <div id="minimap-box">
+            <svg id="minimap" viewBox="0 0 200 150" aria-label="minimap - click or drag to move the view"></svg>
+            <button id="minimapButton" type="button" aria-expanded="true" title="minimise the minimap">&#x2212;</button>
+          </div>
+        </div>
+
+        <!-- the floating Tools palette -->
+        <nav id="tools" aria-label="Tools">
+          <div class="palette-title">Tools</div>
+          <div class="tool-grid">
+            <button id="selectButton" class="tool" title="select / move (STATE_SELECT)">
+              <svg viewBox="0 0 24 24"><path d="M6 3 L6 19 L10 15 L13 21 L15.5 20 L12.5 14 L18 14 Z" /></svg>
+            </button>
+            <button id="newStateButton" class="tool" title="new state - press, then drag onto the diagram">
+              <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="4" class="outline" /></svg>
+            </button>
+            <button id="newConnectorButton" class="tool" title="new connector (transition) - press, then drag its start onto a state">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="5" height="5" class="outline" /><path d="M8 8 L19 19 M19 12 L19 19 L12 19" class="outline blue" /></svg>
+            </button>
+            <button id="newChoiceButton" class="tool" title="new choice (decision) - press, then drag onto the diagram">
+              <svg viewBox="0 0 24 24"><path d="M12 4 L21 12 L12 20 L3 12 Z" class="outline" /></svg>
+            </button>
+            <button id="newInitialButton" class="tool" title="new initial state (the start dot) - press, then drag onto the diagram">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5" /></svg>
+            </button>
+            <button id="newFinalButton" class="tool" title="new final state (the end bullseye) - press, then drag onto the diagram">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7" class="outline" /><circle cx="12" cy="12" r="3.5" /></svg>
+            </button>
+            <button id="newTerminateButton" class="tool" title="new terminate state (the X: the object is deleted) - press, then drag onto the diagram">
+              <svg viewBox="0 0 24 24"><path d="M6 6 L18 18 M18 6 L6 18" class="outline" /></svg>
+            </button>
+            <button id="tidyUpButton" class="tool" title="tidy up - move the states so arrows cross as little as possible">
+              <svg viewBox="0 0 24 24"><rect x="2" y="3" width="7" height="5" rx="1.5" class="outline" /><rect x="15" y="3" width="7" height="5" rx="1.5" class="outline" /><rect x="2" y="16" width="7" height="5" rx="1.5" class="outline" /><path d="M9 5.5 L15 5.5 M5.5 8 L5.5 16" class="outline blue" /></svg>
+            </button>
+          </div>
+          <div class="palette-title">View</div>
+          <div class="tool-grid">
+            <button id="zoomInButton" class="tool" title="zoom in (or turn the mouse wheel; drag with the middle button to move everything)">
+              <svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" class="outline" /><path d="M15 15 L21 21" class="outline thick" /><path d="M7 10 L13 10 M10 7 L10 13" class="outline" /></svg>
+            </button>
+            <button id="zoomOutButton" class="tool" title="zoom out (or turn the mouse wheel)">
+              <svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" class="outline" /><path d="M15 15 L21 21" class="outline thick" /><path d="M7 10 L13 10" class="outline" /></svg>
+            </button>
+            <button id="zoom100Button" class="tool zoom-text" title="zoom to 100%">100%</button>
+            <button id="zoomFitButton" class="tool" title="fit - zoom and center so the whole diagram is on screen">
+              <svg viewBox="0 0 24 24"><path d="M3 8 L3 3 L8 3 M16 3 L21 3 L21 8 M21 16 L21 21 L16 21 M8 21 L3 21 L3 16" class="outline" /><rect x="8" y="9" width="8" height="6" rx="1.5" class="outline" /></svg>
+            </button>
+            <!-- NEW: shows the states now -> as they will be if you click it (behaviours shown or hidden) -->
+            <button id="behavioursButton" class="tool" aria-pressed="true" title="hide the states' entry/ do/ exit/ behaviours">
+              <svg class="when-hidden" viewBox="0 0 60 22"><rect x="1.5" y="2.5" width="19" height="17" rx="5" class="outline" /><path d="M7.0 11 L15.0 11" class="outline" /><path d="M24 11 L35 11 M31 7 L35 11 L31 15" class="outline" /><g class="next"><rect x="39.5" y="2.5" width="19" height="17" rx="5" class="outline" /><path d="M39.5 8 L58.5 8" class="outline" /><path d="M43.0 12 L53.0 12 M43.0 15.5 L50.0 15.5" class="outline blue" /></g></svg>
+              <svg class="when-shown" viewBox="0 0 60 22"><rect x="1.5" y="2.5" width="19" height="17" rx="5" class="outline" /><path d="M1.5 8 L20.5 8" class="outline" /><path d="M5.0 12 L15.0 12 M5.0 15.5 L12.0 15.5" class="outline blue" /><path d="M24 11 L35 11 M31 7 L35 11 L31 15" class="outline" /><g class="next"><rect x="39.5" y="2.5" width="19" height="17" rx="5" class="outline" /><path d="M45.0 11 L53.0 11" class="outline" /></g></svg>
+            </button>
+          </div>
+          <div class="palette-title">&lt;xml&gt;</div>
+          <button id="exportXMLButton" class="xml-tool" title="export: generate game.xml from the diagram">xml &#x25B6;</button>
+          <button id="importXMLButton" class="xml-tool" title="import: build the diagram from a game.xml file">&#x25B6; xml</button>
+        </nav>
+
+        <!-- the Properties panel -->
+        <section id="properties" aria-label="Properties"></section>
+      </section>
+
+      <!-- ===== the generated game.xml (the Flash "exportXML" frame) ===== -->
+      <section id="export-screen" hidden>
+        <div class="export-bar">
+          <button id="backToDiagramButton">&#x25C0; back to diagram</button>
+          <span class="muted">generated from the diagram</span>
+        </div>
+        <div class="export-files">
+          <div class="export-file">
+            <div class="export-file-bar">
+              <strong>game.xml</strong>
+              <button class="secondary" data-copy="xml-output">copy</button>
+              <button class="secondary" data-download="xml-output" data-filename="game.xml">download</button>
+            </div>
+            <textarea id="xml-output" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===== import dialog ===== -->
+    <dialog id="import-dialog">
+      <form method="dialog">
+        <h2>Import game.xml</h2>
+        <p class="muted">This replaces the current diagram. If the XML has no positions, the states are laid out for you.</p>
+        <p>
+          <label>example: <select id="import-example"><option value="">(choose an example)</option></select></label>
+          <label>or a file: <input type="file" id="import-file" accept=".xml,text/xml" /></label>
+        </p>
+        <textarea id="import-text" spellcheck="false" placeholder="...or paste game.xml here"></textarea>
+        <p class="dialog-buttons">
+          <button value="cancel" class="secondary" id="importCancelButton">cancel</button>
+          <button value="import" id="importOkButton">import</button>
+        </p>
+      </form>
+    </dialog>
+
+    <!-- ===== messages (e.g. import warnings) ===== -->
+    <dialog id="message-dialog">
+      <form method="dialog">
+        <pre id="message-text"></pre>
+        <p class="dialog-buttons"><button value="ok">OK</button></p>
+      </form>
+    </dialog>
+
+    <script src="app.js"></script>
+  </body>
+</html>
